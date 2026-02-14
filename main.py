@@ -1,14 +1,13 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from openai import OpenAI
+import openai
 import os
 
 app = FastAPI()
 
-# OpenAI client
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+# Set API key
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
-# Request model
 class ResumeRequest(BaseModel):
     resume_text: str
     job_role: str
@@ -37,14 +36,18 @@ Resume:
 {data.resume_text}
 """
 
-    response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
-        messages=[
-            {"role": "system", "content": "You help people get jobs."},
-            {"role": "user", "content": prompt}
-        ]
-    )
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You help people get jobs."},
+                {"role": "user", "content": prompt}
+            ]
+        )
 
-    return {
-        "improved_resume": response.choices[0].message.content
-    }
+        return {
+            "improved_resume": response["choices"][0]["message"]["content"]
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
