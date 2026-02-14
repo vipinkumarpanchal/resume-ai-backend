@@ -1,3 +1,26 @@
+import os
+from fastapi import FastAPI
+from pydantic import BaseModel
+from openai import OpenAI
+
+# 1️⃣ Create FastAPI app FIRST
+app = FastAPI()
+
+# 2️⃣ Create OpenAI client
+client = OpenAI()
+
+# 3️⃣ Request model
+class ResumeRequest(BaseModel):
+    resume_text: str
+    job_role: str
+    experience_level: str
+
+# 4️⃣ Health check
+@app.get("/")
+def home():
+    return {"status": "Resume AI Backend is running"}
+
+# 5️⃣ Main API
 @app.post("/improve-resume")
 def improve_resume(data: ResumeRequest):
     prompt = f"""
