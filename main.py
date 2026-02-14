@@ -20,7 +20,7 @@ def home():
 
 @app.post("/improve-resume")
 def improve_resume(data: ResumeRequest):
-prompt = f"""
+    prompt = f"""
 You are an ATS resume expert for the Indian job market.
 
 Target job role: {data.job_role}
@@ -36,7 +36,8 @@ Improve the resume below:
 Resume:
 {data.resume_text}
 """
-response = client.chat.completions.create(
+
+    response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
             {"role": "system", "content": "You help people get jobs."},
