@@ -37,13 +37,14 @@ Resume:
 {data.resume_text}
 """
 
-    response = client.responses.create(
-        model="gpt-4.1-mini",
-        input=prompt
-    )
+    response = client.chat.completions.create(
+    model="gpt-3.5-turbo",
+    messages=[
+        {"role": "system", "content": "You help people get jobs."},
+        {"role": "user", "content": prompt}
+    ]
+)
 
-    improved_text = response.output_text
-
-    return {
-        "improved_resume": improved_text
-    }
+return {
+    "improved_resume": response.choices[0].message.content
+}
