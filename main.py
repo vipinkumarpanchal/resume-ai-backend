@@ -5,7 +5,6 @@ import os
 
 app = FastAPI()
 
-# OpenAI client
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 class ResumeRequest(BaseModel):
@@ -38,14 +37,13 @@ Resume:
 {data.resume_text}
 """
 
-    completion = client.chat.completions.create(
-        model="gpt-3.5-turbo",
-        messages=[
-            {"role": "system", "content": "You help people get jobs."},
-            {"role": "user", "content": prompt}
-        ]
+    response = client.responses.create(
+        model="gpt-4.1-mini",
+        input=prompt
     )
 
+    improved_text = response.output_text
+
     return {
-        "improved_resume": completion.choices[0].message.content
+        "improved_resume": improved_text
     }
