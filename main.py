@@ -5,6 +5,7 @@ import os
 
 app = FastAPI()
 
+# OpenAI client
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 class ResumeRequest(BaseModel):
@@ -12,13 +13,14 @@ class ResumeRequest(BaseModel):
     job_role: str
     experience_level: str
 
+
 @app.get("/")
 def home():
     return {"status": "Resume AI Backend is running"}
 
+
 @app.post("/improve-resume")
 def improve_resume(data: ResumeRequest):
-
     prompt = f"""
 You are an ATS resume expert for the Indian job market.
 
@@ -36,11 +38,14 @@ Resume:
 {data.resume_text}
 """
 
-    response = client.responses.create(
-        model="gpt-4.1-mini",
-        input=prompt
+    completion = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "You help people get jobs."},
+            {"role": "user", "content": prompt}
+        ]
     )
 
     return {
-        "optimized_resume": response.output_text
+        "improved_resume": completion.choices[0].message.content
     }
